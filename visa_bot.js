@@ -166,7 +166,7 @@ bot.onText(/Добавить новый ВНЖ/, (msg) => {
 bot.onText(/Показать мои ВНЖ/, (msg) => {
   chatId = msg.chat.id;
   bot
-    .sendMessage(msg.chat.id, '')
+    .sendMessage(msg.chat.id, '***************************')
     .then(async () => {
       const visaDoc = await getUserVisas(chatId);
       const userVisaData = visaDoc.visas;
@@ -187,7 +187,7 @@ bot.onText(/Показать мои ВНЖ/, (msg) => {
 bot.onText(/Рассчитать даты/, (msg) => {
   chatId = msg.chat.id;
   bot
-    .sendMessage(msg.chat.id, '')
+    .sendMessage(msg.chat.id, '***************************')
     .then(async () => {
       const visaDoc = await getUserVisas(chatId);
       const userVisaData = visaDoc.visas;
