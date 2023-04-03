@@ -31,7 +31,11 @@ bot.onText(/\/start/, (msg) => {
   chatId = msg.chat.id;
   // Отправляем приветственное сообщение
   bot
-    .sendMessage(msg.chat.id, 'Добро пожаловать! Давайте начнем работу.', menu)
+    .sendMessage(msg.chat.id, `Я помогу Вам рассчитать разрешенную дату подачи 
+    заявлений на ПМЖ и гражданство Финляндии на основании имеющегося у Вас стажа по ВНЖ.
+    Если ваши ВНЖ пересекались по датам (например, получили новый ВНЖ с датой начала, 
+    которая входит в период действия предыдущего), то вводите дату следующего так, 
+    как будто предыдущий закончился в день начала следующего. Итак, приступим.`, menu)
     .then(async () => {
       const visaDoc = await getUserVisas(chatId);
 
@@ -47,18 +51,20 @@ bot.onText(/\/start/, (msg) => {
           });
           bot.sendMessage(chatId, message);
         } else {
-          bot.sendMessage(chatId, 'У вас еще нет добавленных ВНЖ для расчета.');
+          bot.sendMessage(chatId, `У вас еще нет добавленных ВНЖ для расчета. 
+          Вы можете добавить новый ВНЖ по кнопке "Добавить" в меню Бота`);
         }
       }
     })
-    .catch((err) => {
+    .catch((err) => 
+    {
       console.log(err);
     });
 });
 
 bot.onText(/Добавить новый ВНЖ/, (msg) => {
   // Запускаем процесс сбора информации о визах
-  bot.sendMessage(msg.chat.id, 'Введите дату начала действия первого ВНЖ:');
+  bot.sendMessage(msg.chat.id, 'Введите дату начала действия ВНЖ:');
   if (!usersStatistics[chatId]) {
     usersStatistics[chatId] = [];
   }
@@ -149,7 +155,8 @@ bot.onText(/Добавить новый ВНЖ/, (msg) => {
     } else if (query.data === 'moreVisa_no') {
       // Если больше нет ВНЖ, то показываем статистику по всем ВНЖ
 
-      bot.sendMessage(chatId, `ВНЖ сохранены`);
+      bot.sendMessage(chatId, `ВНЖ сохранены. Можете посмотреть Ваши ВНЖ 
+      и рассчитать даты по кнопкам в меню Бота`);
     }
   });
 
@@ -159,7 +166,7 @@ bot.onText(/Добавить новый ВНЖ/, (msg) => {
 bot.onText(/Показать мои ВНЖ/, (msg) => {
   chatId = msg.chat.id;
   bot
-    .sendMessage(msg.chat.id, 'Добавленные ранее ВНЖ:')
+    .sendMessage(msg.chat.id, '')
     .then(async () => {
       const visaDoc = await getUserVisas(chatId);
       const userVisaData = visaDoc.visas;
@@ -180,7 +187,7 @@ bot.onText(/Показать мои ВНЖ/, (msg) => {
 bot.onText(/Рассчитать даты/, (msg) => {
   chatId = msg.chat.id;
   bot
-    .sendMessage(msg.chat.id, 'Рассчитываю даты возможной подачи документов')
+    .sendMessage(msg.chat.id, '')
     .then(async () => {
       const visaDoc = await getUserVisas(chatId);
       const userVisaData = visaDoc.visas;
