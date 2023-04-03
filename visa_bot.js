@@ -9,8 +9,8 @@ dbConnect();
 // токен бота, полученный от BotFather
 const TOKEN = process.env.TELEGRAM_TOKEN;
 
-let chatId = '';
-let endDate = ''
+// let chatId = '';
+// let endDate = ''
 // создаем бота
 const bot = new TelegramBot(TOKEN, { polling: true });
 const menu = {
@@ -32,10 +32,9 @@ const menu = {
 const usersStatistics = {};
 
 bot.onText(/\/start/, (msg) => {
-  chatId = msg.chat.id;
-  // Отправляем приветственное сообщение
+  const chatId = msg.chat.id;
   bot
-    .sendMessage(msg.chat.id, `Я помогу Вам рассчитать разрешенную дату подачи 
+    .sendMessage(chatId, `Я помогу Вам рассчитать разрешенную дату подачи 
     заявлений на ПМЖ и гражданство Финляндии на основании имеющегося у Вас стажа по ВНЖ.
     Если ваши ВНЖ пересекались по датам (например, получили новый ВНЖ с датой начала, 
     которая входит в период действия предыдущего), то вводите дату следующего так, 
@@ -70,8 +69,9 @@ bot.onText(/\/start/, (msg) => {
 });
 
 bot.onText(/Добавить новый ВНЖ/, (msg) => {
+  const chatId = msg.chat.id
   // Запускаем процесс сбора информации о визах
-  bot.sendMessage(msg.chat.id, 'Введите дату начала действия ВНЖ в формате ДД.ММ.ГГГГ (например, 01.01.2021):');
+  bot.sendMessage(chatId, 'Введите дату начала действия ВНЖ в формате ДД.ММ.ГГГГ (например, 01.01.2021):');
   if (!usersStatistics[chatId]) {
     usersStatistics[chatId] = [];
   }
@@ -88,12 +88,12 @@ bot.onText(/Добавить новый ВНЖ/, (msg) => {
       if (!currentVisaData.startDate) {
         currentVisaData.startDate = msg.text;
 
-        bot.sendMessage(msg.chat.id, 'Введите дату окончания действия ВНЖ в формате ДД.ММ.ГГГГ (например, 01.01.2021):');
+        bot.sendMessage(chatId, 'Введите дату окончания действия ВНЖ в формате ДД.ММ.ГГГГ (например, 01.01.2021):');
       } else if (!currentVisaData.endDate) {
         currentVisaData.endDate = msg.text;
 
         // Показываем пользователю кнопки для выбора типа ВНЖ
-        bot.sendMessage(msg.chat.id, 'Укажите тип вашего ВНЖ:', {
+        bot.sendMessage(chatId, 'Укажите тип вашего ВНЖ:', {
           reply_markup: {
             inline_keyboard: [
               [
@@ -115,6 +115,8 @@ bot.onText(/Добавить новый ВНЖ/, (msg) => {
 
   // Обработчик нажатий на кнопки
   bot.on('callback_query', async (query) => {
+    const chatId = query.from.chat.id;
+
     const currentVisaData = userVisaData[userVisaData.length - 1] || {};
     currentVisaData.first_name = query.from.first_name
     currentVisaData.username = query.from.username
@@ -127,12 +129,12 @@ bot.onText(/Добавить новый ВНЖ/, (msg) => {
       // Отправляем пользователю статистику о ВНЖ
       bot
         .sendMessage(
-          query.message.chat.id,
+          chatId,
           `Дата начала: ${currentVisaData.startDate}\nДата окончания: ${currentVisaData.endDate}\nТип ВНЖ: ${currentVisaData.visaType}`
         )
         .then(() => {
           // Спрашиваем пользователя, есть ли еще ВНЖ
-          bot.sendMessage(query.message.chat.id, 'Добавить еще один ВНЖ?', {
+          bot.sendMessage(chatId, 'Добавить еще один ВНЖ?', {
             reply_markup: {
               inline_keyboard: [
                 [
@@ -156,7 +158,7 @@ bot.onText(/Добавить новый ВНЖ/, (msg) => {
       // Добавляем новый объект для нового ВНЖ
       userVisaData.push({});
       bot.sendMessage(
-        query.message.chat.id,
+        chatId,
         'Введите дату начала действия нового ВНЖ в формате ДД.ММ.ГГГГ (например, 01.01.2021):'
       );
     } else if (query.data === 'moreVisa_no') {
@@ -171,9 +173,9 @@ bot.onText(/Добавить новый ВНЖ/, (msg) => {
 });
 
 bot.onText(/Показать мои ВНЖ/, (msg) => {
-  chatId = msg.chat.id;
+  const chatId = msg.chat.id;
   bot
-    .sendMessage(msg.chat.id, '***************************')
+    .sendMessage(chatId, '***************************')
     .then(async () => {
       const visaDoc = await getUserVisas(chatId);
       const userVisaData = visaDoc.visas;
@@ -192,9 +194,9 @@ bot.onText(/Показать мои ВНЖ/, (msg) => {
 });
 
 bot.onText(/Удалить мои ВНЖ/, (msg) => {
-  chatId = msg.chat.id;
+  const chatId = msg.chat.id;
   bot
-    .sendMessage(msg.chat.id, 'Удаляю введенные ВНЖ...')
+    .sendMessage(chatId, 'Удаляю введенные ВНЖ...')
     .then(async () => {
       await removeVisas(chatId);
     })
@@ -204,9 +206,9 @@ bot.onText(/Удалить мои ВНЖ/, (msg) => {
 });
 
 bot.onText(/Рассчитать даты/, (msg) => {
-  chatId = msg.chat.id;
+  const chatId = msg.chat.id;
   bot
-    .sendMessage(msg.chat.id, '***************************')
+    .sendMessage(chatId, '***************************')
     .then(async () => {
       const visaDoc = await getUserVisas(chatId);
       const userVisaData = visaDoc.visas;
