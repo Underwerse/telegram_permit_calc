@@ -46,7 +46,7 @@ const VisaSchema = new mongoose.Schema(
 );
 
 VisaSchema.pre('save', function (next) {
-  this._update.modified =
+  this.modified =
     new Date().toISOString().slice(0, 19).replace('T', ' ') + '.000'
   next()
 })

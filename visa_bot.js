@@ -10,6 +10,7 @@ dbConnect();
 const TOKEN = process.env.TELEGRAM_TOKEN;
 
 let chatId = '';
+let endDate = ''
 // создаем бота
 const bot = new TelegramBot(TOKEN, { polling: true });
 const menu = {
@@ -51,9 +52,12 @@ bot.onText(/\/start/, (msg) => {
           });
           bot.sendMessage(chatId, message);
         } else {
-          bot.sendMessage(chatId, `У вас еще нет добавленных ВНЖ для расчета. 
+          bot.sendMessage(chatId, `***************************\nУ вас еще нет добавленных ВНЖ для расчета. 
           Вы можете добавить новый ВНЖ по кнопке "Добавить" в меню Бота`);
         }
+      } else {
+        bot.sendMessage(chatId, `***************************\nУ вас еще нет добавленных ВНЖ для расчета. 
+        Вы можете добавить новый ВНЖ по кнопке "Добавить" в меню Бота`);
       }
     })
     .catch((err) => 
@@ -64,7 +68,7 @@ bot.onText(/\/start/, (msg) => {
 
 bot.onText(/Добавить новый ВНЖ/, (msg) => {
   // Запускаем процесс сбора информации о визах
-  bot.sendMessage(msg.chat.id, 'Введите дату начала действия ВНЖ:');
+  bot.sendMessage(msg.chat.id, 'Введите дату начала действия ВНЖ в формате ДД.ММ.ГГГГ (например, 01.01.2021):');
   if (!usersStatistics[chatId]) {
     usersStatistics[chatId] = [];
   }
@@ -76,14 +80,12 @@ bot.onText(/Добавить новый ВНЖ/, (msg) => {
   // Функция для обработки входящих сообщений от пользователя
   const visaHandler = (msg) => {
     const currentVisaData = userVisaData[userVisaData.length - 1] || {};
-    currentVisaData.first_name = msg.chat.first_name
-    currentVisaData.username = msg.chat.username
     // Если пользователь ответил на вопрос о дате начала ВНЖ
     if (msg.text.match(/^\d{2}\.\d{2}\.\d{4}$/)) {
       if (!currentVisaData.startDate) {
         currentVisaData.startDate = msg.text;
 
-        bot.sendMessage(msg.chat.id, 'Введите дату окончания действия ВНЖ:');
+        bot.sendMessage(msg.chat.id, 'Введите дату окончания действия ВНЖ в формате ДД.ММ.ГГГГ (например, 01.01.2021):');
       } else if (!currentVisaData.endDate) {
         currentVisaData.endDate = msg.text;
 
@@ -111,6 +113,8 @@ bot.onText(/Добавить новый ВНЖ/, (msg) => {
   // Обработчик нажатий на кнопки
   bot.on('callback_query', async (query) => {
     const currentVisaData = userVisaData[userVisaData.length - 1] || {};
+    currentVisaData.first_name = query.from.first_name
+    currentVisaData.username = query.from.username
 
     if (query.data === 'visaType_A' || query.data === 'visaType_B') {
       currentVisaData.visaType = query.data.split('_')[1];
@@ -150,7 +154,7 @@ bot.onText(/Добавить новый ВНЖ/, (msg) => {
       userVisaData.push({});
       bot.sendMessage(
         query.message.chat.id,
-        'Введите дату начала действия нового ВНЖ:'
+        'Введите дату начала действия нового ВНЖ в формате ДД.ММ.ГГГГ (например, 01.01.2021):'
       );
     } else if (query.data === 'moreVisa_no') {
       // Если больше нет ВНЖ, то показываем статистику по всем ВНЖ
