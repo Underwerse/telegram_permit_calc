@@ -42,3 +42,17 @@ export async function createNewVisa(data) {
     console.error('Error: ' + error.message);
   }
 }
+
+export async function removeVisas(chatId) {
+  try {
+    const visa = await getUserVisas(chatId);
+
+    if (visa) {
+      visa.visas = [];
+
+      await visa.save();
+    } 
+  } catch (error) {
+    console.error('Error: ' + error.message);
+  }
+}

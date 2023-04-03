@@ -1,7 +1,7 @@
 import TelegramBot from 'node-telegram-bot-api';
 import dotenv from 'dotenv';
 import { dbConnect } from './mongo.js';
-import { createNewVisa, getUserVisas } from './visasProcessing.js';
+import { createNewVisa, getUserVisas, removeVisas } from './visasProcessing.js';
 
 dotenv.config();
 dbConnect();
@@ -19,6 +19,9 @@ const menu = {
       [
         { text: 'Добавить новый ВНЖ' },
         { text: 'Показать мои ВНЖ' },
+      ],
+      [
+        { text: 'Удалить мои ВНЖ' },
         { text: 'Рассчитать даты' },
       ],
     ],
@@ -182,6 +185,18 @@ bot.onText(/Показать мои ВНЖ/, (msg) => {
       }
 
       bot.sendMessage(chatId, `Статистика ВНЖ:\n\n${statistics}`);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
+bot.onText(/Удалить мои ВНЖ/, (msg) => {
+  chatId = msg.chat.id;
+  bot
+    .sendMessage(msg.chat.id, 'Удаляю введенные ВНЖ...')
+    .then(async () => {
+      await removeVisas(chatId);
     })
     .catch((err) => {
       console.log(err);
