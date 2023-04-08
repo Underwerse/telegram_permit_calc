@@ -115,7 +115,7 @@ bot.onText(/Добавить новый ВНЖ/, (msg) => {
 
   // Обработчик нажатий на кнопки
   bot.on('callback_query', async (query) => {
-    const chatId = query.from.chat.id;
+    const chatId = query.from.id;
 
     const currentVisaData = userVisaData[userVisaData.length - 1] || {};
     currentVisaData.first_name = query.from.first_name
